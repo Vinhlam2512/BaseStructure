@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  erp.api:
+    image: ${DOCKER_REGISTRY-}erpapi
+    container_name: erp.Api
+    build:
+      context: .
+      dockerfile: ./src/ERP.Api/Dockerfile
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8000 # Set HTTP port inside the container
+      - ASPNETCORE_HTTPS_PORTS=443 # Set HTTPS port inside the container (if used)
+      - ASPNETCORE_URLS=http://+:8000 # Listen on all IP addresses on port 80
+    networks:
+      - erp
+
+  # erp.client:
+  #   image: ${DOCKER_REGISTRY-}erpclient
+  #   container_name: erp.client
+  #   build:
+  #     context: ./client
+  #     dockerfile: ./Dockerfile
+  #   expose:
+  #     - "4000"
+  #   networks:
+  #     - erp
+
+  erp-nginx:
+    image: nginx:latest
+    container_name: nginx
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./client/dist/client/browser:/usr/share/nginx/html:ro
+    depends_on:
+      - erp.api
+      # - erp.client
+    networks:
+      - erp
+
+  erp-redis:
+    image: redis:latest
+    container_name: erp.Redis
+    restart: always
+    ports:
+      - '6379:6379'
+    networks:
+      - erp
+
+networks:
+  erp:
+    driver: bridge
