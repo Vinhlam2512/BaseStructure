@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import '../../node_modules/antd/dist/reset.css';
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+* {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #6b7280 transparent; /* For Firefox */
+}
+
+*::-webkit-scrollbar {
+  width: 8px; /* Adjust the width of the scrollbar */
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent; /* Background of the scrollbar track */
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #6b7280; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners */
+  border: 2px solid transparent; /* Space around the thumb */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563; /* Darker color on hover */
+}
