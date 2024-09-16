@@ -3,10 +3,16 @@ import { Divider, Flex, Table } from 'antd';
 import ModalConnect from './components/modal-connect';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { saveShop } from '../../../redux/shop.slice';
+import { useCreateTokenMutation } from '../../../services/shop.service';
+import { useSearchParams } from 'next/navigation';
 
 const SanTMDTPage = () => {
+  const [createToken, { isLoading, isSuccess, isError, error }] =
+    useCreateTokenMutation();
+
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+
   const dataSource = [
     {
       key: '1',
@@ -41,11 +47,22 @@ const SanTMDTPage = () => {
   ];
 
   useEffect(() => {
-    dispatch(saveShop({ firstName: 'asd' }));
-  });
+    const shop_id = searchParams.get('shop_id');
+    const code = searchParams.get('code');
+    if (code && shop_id) {
+      const data = {
+        code,
+        shopId: shop_id
+      };
+      createToken(data);
+    }
+  }, [searchParams]);
 
   return (
     <>
+      {isLoading && <p>Creating token...</p>}
+      {isSuccess && <p>Token created successfully!</p>}
+      {isError && <p>Failed to create token: {error?.message}</p>}
       <Flex gap="small" wrap justify="space-between">
         <h2 className="font-bold">Kết nối sàn TMĐT</h2>
         <ModalConnect />
