@@ -1,0 +1,6 @@
+@LETOS.API_HostAddress = http://localhost:5278
+
+GET {{LETOS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

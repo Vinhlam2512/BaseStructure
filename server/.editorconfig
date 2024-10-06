@@ -82,7 +82,7 @@ dotnet_diagnostic.IDE0053.severity = none
 
 [*.{cs,vb}]
 dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
-dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_prefer_simplified_intLETOSolation = true:suggestion
 dotnet_style_namespace_match_folder = true:suggestion
 
 # Field preferences
