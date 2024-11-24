@@ -24,4 +24,13 @@ public class KhachHangController : ApiController
 
         return result.IsFailure ? HandlerFailure(result) : Ok(result);
     }
+
+    //[HttpGet]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //public async Task<IActionResult> GetShops([FromQuery] GetShopsQuery query)
+    //{
+    //    var result = await Sender.Send(query);
+    //    return result.IsFailure ? HandlerFailure(result) : Ok(result.Value);
+    //}
 }

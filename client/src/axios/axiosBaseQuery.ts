@@ -1,26 +1,27 @@
 import axiosInstance from './axiosInstance';
 
-interface ApiResponse {
-  isSuccess: boolean;
-  isFailure: boolean;
-  error?: ApiError;
-}
+// interface ApiResponse {
+//   isSuccess: boolean;
+//   isFailure: boolean;
+//   error?: ApiError;
+//   value: any;
+// }
 
-interface ApiErrorFormat1 {
-  code: string;
-  message: string;
-}
+// interface ApiError {
+//   code: string;
+//   message: string;
+// }
 
-// Format 2: Standard Error Format
-interface ApiErrorFormat2 {
-  type: string;
-  title: string;
-  status: number;
-  detail: string;
-  errors: any; // Could be more specific if you have information about its structure
-}
+// // Format 2: Standard Error Format
+// interface ApiErrorFormat2 {
+//   type: string;
+//   title: string;
+//   status: number;
+//   detail: string;
+//   errors: ApiError; // Could be more specific if you have information about its structure
+// }
 
-type ApiError = ApiErrorFormat1 | ApiErrorFormat2;
+// type Error = ApiResponse | ApiErrorFormat2;
 
 interface AxiosBaseQueryType {
   url: string;
@@ -28,48 +29,66 @@ interface AxiosBaseQueryType {
   data?: any;
   params?: any;
   headers?: any;
+  responseType?:
+    | 'json'
+    | 'blob'
+    | 'text'
+    | 'arraybuffer'
+    | 'document'
+    | 'stream';
 }
 
 const axiosBaseQuery =
   () =>
-  async ({ url, method, data, params, headers }: AxiosBaseQueryType) => {
+  async ({
+    url,
+    method,
+    data,
+    params,
+    headers,
+    responseType
+  }: AxiosBaseQueryType) => {
     try {
-      console.log('Headers received:', headers);
       const result = await axiosInstance({
         url: url,
         method,
         data,
         params,
-        headers
+        headers,
+        responseType: responseType || 'json',
+        withCredentials: true
       });
-      const responseData: ApiResponse = result.data;
 
-      if (responseData.isSuccess) {
-        return { data: responseData };
-      } else {
-        throw new Error(responseData.error?.message || 'Unknown error');
-      }
-    } catch (axiosError) {
-      const error = axiosError as { response?: { data: ApiError } };
+      if (responseType === 'blob') {
+        const blob = result.data;
 
-      if (error.response?.data) {
-        const apiError = error.response.data;
-
-        if ('code' in apiError && 'message' in apiError) {
-          return Promise.reject({
-            message: apiError.message,
-            code: apiError.code
-          });
-        } else if ('type' in apiError && 'detail' in apiError) {
-          return Promise.reject({
-            message: apiError.detail,
-            type: apiError.type,
-            status: apiError.status
-          });
+        const contentDisposition =
+          result.headers['content-disposition'] ||
+          result.headers['Content-Disposition'];
+        let fileName = 'downloaded_file.xlsx';
+        if (contentDisposition) {
+          const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(
+            contentDisposition
+          );
+          if (matches != null && matches[1]) {
+            fileName = matches[1].replace(/['"]/g, '');
+          }
         }
+
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+        return { data: null };
       }
 
-      return Promise.reject({ message: 'An unknown error occurred' });
+      return { data: result.data };
+    } catch (axiosError) {
+      return { error: axiosError };
     }
   };
 export default axiosBaseQuery;
